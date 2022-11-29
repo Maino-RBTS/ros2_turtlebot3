@@ -1,16 +1,3 @@
-# Turtlebot3 Waffle PI model Based
-# Mode : 0 -> Nonstop driving
-# Mode : 1 -> Repeat Stop and Driving
-
-# 1. select mode
-# 2. input Rectangle size (mm): width, height
-# 3. input Linear Velocity : 0 ~ 0.26m/s (0.1 recommended)
-# 4. input Rotate Angle per second (degree) : 30 degree recommended
-# 5. input Path Spacing (cm)
--- if mode 1 --
-# 6. input Pause Distance (cm)
-# 7. input Stop Delay (s)
-
 import rclpy
 import sys
 import select
@@ -100,13 +87,12 @@ class Routh_Auto_Driving(Node):
         self.TOT_REP = int(Reps)
         self.REP = 0
         self.weight = 0.06
-
-        self.stop_count = float(self.w/(self.PD*10))
-        self.SDCV = int(self.SCV/self.stop_count)
-        self.count_value = 0
         
         if(self.MODE == '1'):
+            self.stop_count = float(self.w/(self.PD*10))
+            self.SDCV = int(self.SCV/self.stop_count)
             self.SCV = 0
+            self.count_value = 0
 
         self.REP1 = self.SCV + self.TCV + int(self.TCV * self.weight)
         self.REP2 = self.REP1 + self.GCV 
@@ -160,6 +146,7 @@ class Routh_Auto_Driving(Node):
                     self.i += 1
                 else:
                     self.MODE = '2'
+                    print(" >>> All Runs are Completed, Ctrl+C to Quit !!! <<< ")
 
         elif(self.MODE == '1'):
             if(self.count_value < self.stop_count and self.REP != self.TOT_REP):
@@ -218,10 +205,10 @@ class Routh_Auto_Driving(Node):
                 else:
                     self.set_Velocity()
                     self.MODE = '2'
+                    print(" >>> All Runs are Completed, Ctrl+C to Quit !!! <<< ")
         else:
             self.MODE = '2'
             self.set_Velocity()
-            print(" >>> All Runs are Completed, Ctrl+C to Quit !!! <<< ")
 
     def set_Velocity(self, lx=0.0, ly=0.0, lz=0.0, ax= 0.0, ay=0.0, az=0.0):
         self.twist.linear.x = lx
